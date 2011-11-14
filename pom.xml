@@ -10,7 +10,7 @@
 
     <groupId>de.cosmocode</groupId>
     <artifactId>logback-xmpp</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.1</version>
 
     <scm>
         <developerConnection>scm:git:git@github.com:cosmocode/${project.artifactId}.git</developerConnection>
