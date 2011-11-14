@@ -1,0 +1,38 @@
+====== XMPP Appender ======
+
+
+Table of contents
+
+  1. Introduction
+  2. Configuration
+
+
+1. Introduction
+    The XMPP Appender is a appender to the logback[1] logging framework.
+    The logged output will be printed in a xmpp channel.
+
+    [1] http://logback.qos.ch/
+
+2. Configuration
+    For logback appender configuration refer to
+    http://logback.qos.ch/manual/appenders.html.
+
+    The xmpp-appender provides the following options:
+
+        server              The XMPP server address
+        user                The username to login on the server
+        password            Users password
+        channel             The channel to join
+        nick       (optional) the nickname to use in the channel
+        channelPassword     (optional) a channel password
+
+    Example configuration:
+
+        <appender name="XMPP" class="de.cosmocode.logback.xmpp.XmppAppender">
+            <server>jabber.server.org</server>
+            <user>myuser@jabber.server.org</user>
+            <password>MyVerySecretPassword</password>
+            <channel>loggingChannel@conference.jabber.server.org</channel>
+            <nick>LogBot</nick>
+        </appender>
+
