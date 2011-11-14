@@ -18,12 +18,10 @@ package de.cosmocode.logback.xmpp;
 
 import ch.qos.logback.classic.spi.LoggingEvent;
 import ch.qos.logback.core.AppenderBase;
-import com.sun.org.apache.xpath.internal.operations.Mult;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smackx.Form;
 import org.jivesoftware.smackx.muc.MultiUserChat;
-import org.jivesoftware.smackx.muc.RoomInfo;
 
 /**
  * XMPP appender for logback.
