@@ -18,9 +18,12 @@ package de.cosmocode.logback.xmpp;
 
 import ch.qos.logback.classic.spi.LoggingEvent;
 import ch.qos.logback.core.AppenderBase;
+import com.sun.org.apache.xpath.internal.operations.Mult;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smackx.Form;
 import org.jivesoftware.smackx.muc.MultiUserChat;
+import org.jivesoftware.smackx.muc.RoomInfo;
 
 /**
  * XMPP appender for logback.
@@ -44,26 +47,45 @@ public final class XmppAppender extends AppenderBase<LoggingEvent> {
                 connection.login(user, password);
 
                 chat = new MultiUserChat(connection, channel);
+                if (roomExists(connection)) {
 
-                if (nick == null) {
-                    if (channelPassword == null) {
-                        chat.join(user);
+                    if (nick == null) {
+                        if (channelPassword == null) {
+                            chat.join(user);
+                        } else {
+                            chat.join(user, channelPassword);
+                        }
                     } else {
-                        chat.join(user, channelPassword);
+                        if (channelPassword == null) {
+                            chat.join(nick);
+                        } else {
+                            chat.join(nick, channelPassword);
+                        }
                     }
                 } else {
-                    if (channelPassword == null) {
-                        chat.join(nick);
+                    if (nick == null) {
+                        chat.create(user);
                     } else {
-                        chat.join(nick, channelPassword);
+                        chat.create(nick);
                     }
+                    chat.sendConfigurationForm(new Form(Form.TYPE_SUBMIT));
                 }
+
             } catch (XMPPException e) {
                 addError(e.getMessage());
                 return;
             }
         }
         super.start();
+    }
+
+    private boolean roomExists(XMPPConnection connection) {
+        try {
+            MultiUserChat.getRoomInfo(connection, channel);
+        } catch (XMPPException e) {
+            return false;
+        }
+        return true;
     }
 
     @Override
