@@ -18,6 +18,8 @@ package de.cosmocode.logback.xmpp;
 
 import ch.qos.logback.classic.spi.LoggingEvent;
 import ch.qos.logback.core.AppenderBase;
+import ch.qos.logback.core.boolex.EvaluationException;
+import ch.qos.logback.core.boolex.EventEvaluator;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smackx.Form;
@@ -35,6 +37,8 @@ public final class XmppAppender extends AppenderBase<LoggingEvent> {
     private String channel;
     private String nick;
     private String channelPassword;
+
+    private EventEvaluator<LoggingEvent> evaluator;
 
     @Override
     public void start() {
@@ -80,67 +84,60 @@ public final class XmppAppender extends AppenderBase<LoggingEvent> {
     private boolean roomExists(XMPPConnection connection) {
         try {
             MultiUserChat.getRoomInfo(connection, channel);
+            return true;
         } catch (XMPPException e) {
             return false;
         }
-        return true;
     }
 
     @Override
-    protected void append(final LoggingEvent eventObject) {
-        try {
-            chat.sendMessage(eventObject.getFormattedMessage());
-        } catch (XMPPException ignored) {
-            chat = null;
-            addError(ignored.getMessage());
+    protected void append(LoggingEvent eventObject) {
+        if (evaluate(eventObject)) {
+            try {
+                chat.sendMessage(eventObject.getFormattedMessage());
+            } catch (XMPPException ignored) {
+                chat = null;
+                addError(ignored.getMessage());
+            }
         }
     }
 
-    public String getServer() {
-        return server;
+    private boolean evaluate(LoggingEvent event) {
+        if (evaluator == null) {
+            return true;
+        }
+        try {
+            return evaluator.evaluate(event);
+        } catch (EvaluationException e) {
+            return false;
+        }
     }
 
     public void setServer(final String server) {
         this.server = server;
     }
 
-    public String getUser() {
-        return user;
-    }
-
     public void setUser(final String user) {
         this.user = user;
-    }
-
-    public String getPassword() {
-        return password;
     }
 
     public void setPassword(final String password) {
         this.password = password;
     }
 
-    public String getChannel() {
-        return channel;
-    }
-
     public void setChannel(final String channel) {
         this.channel = channel;
-    }
-
-    public String getNick() {
-        return nick;
     }
 
     public void setNick(final String nick) {
         this.nick = nick;
     }
 
-    public String getChannelPassword() {
-        return channelPassword;
-    }
-
     public void setChannelPassword(final String channelPassword) {
         this.channelPassword = channelPassword;
+    }
+
+    public void setEvaluator(final EventEvaluator<LoggingEvent> evaluator) {
+        this.evaluator = evaluator;
     }
 }
